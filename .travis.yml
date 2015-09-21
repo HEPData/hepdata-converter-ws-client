@@ -1,0 +1,24 @@
+language: python
+
+python:
+  - '2.7'
+sudo: required
+
+cache:
+  - docker
+
+services:
+  - docker
+
+install:
+  - sudo pip install --upgrade pip
+  - sudo pip install coveralls
+  - sudo pip install -r requirements.txt
+
+script:
+  - export CURRENT_PATH=`pwd`
+  - docker run hepdata/hepdata-converter-ws /bin/bash -c "sudo pip install hepdata-converter-ws && "
+  - coverage run -m unittest discover hepdata_converter/testsuite 'test_*'
+after_success:
+  - coveralls
+
