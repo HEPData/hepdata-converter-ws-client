@@ -17,8 +17,7 @@ install:
 
 script:
   - export CURRENT_PATH=`pwd`
-  - docker run hepdata/hepdata-converter-ws /bin/bash -c "sudo pip install hepdata-converter-ws && "
-  - coverage run -m unittest discover hepdata_converter/testsuite 'test_*'
+  - docker run -v $CURRENT_PATH:$CURRENT_PATH hepdata/hepdata-converter-ws /bin/bash -c "sudo pip install hepdata-converter-ws && cd  $CURRENT_PATH && coverage run -m unittest discover hepdata_converter/testsuite 'test_*'"
 after_success:
   - coveralls
 

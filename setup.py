@@ -18,6 +18,7 @@ setup(
     install_requires=[
         'requests',
     ],
+    tests_require=['flask-testing', 'flask', 'hepdata-converter-ws'],
 
     packages=['hepdata_converter_ws_client'],
     url='https://github.com/HEPData/hepdata-converter-ws-client/',
