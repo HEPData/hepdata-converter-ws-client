@@ -1,23 +1,28 @@
 language: python
-
 python:
-  - '2.7'
+- '2.7'
 sudo: required
-
 cache:
-  - docker
-
+- docker
 services:
-  - docker
-
+- docker
 install:
-  - sudo pip install --upgrade pip
-  - sudo pip install coveralls
-  - sudo pip install -r requirements.txt
-
+- sudo pip install --upgrade pip
+- sudo pip install coveralls
+- sudo pip install -r requirements.txt
 script:
-  - export CURRENT_PATH=`pwd`
-  - docker run -v $CURRENT_PATH:$CURRENT_PATH hepdata/hepdata-converter-ws /bin/bash -c "sudo pip install hepdata-converter-ws && cd  $CURRENT_PATH && coverage run -m unittest discover hepdata_converter/testsuite 'test_*'"
-after_success:
-  - coveralls
+- export CURRENT_PATH=`pwd`
+- docker run -v $CURRENT_PATH:$CURRENT_PATH hepdata/hepdata-converter-ws /bin/bash -c "sudo pip install hepdata-converter-ws && cd  $CURRENT_PATH && coverage run -m unittest discover hepdata_converter_ws_client/testsuite 'test_*'"
 
+after_success:
+- coveralls
+
+deploy:
+  provider: pypi
+  user: hepdata
+  password:
+    secure: gByrsSpqtgUKru839J10RUsZCuTw/RwsHHQVRhG5OxdGwS6s/s9zYxKOJJjA1YpiswDNOXVPC4I1pmty971g1kDDIJcV814PTsHUBhf7tDWx6ZJ2mjCoXl7zdPDH4sDxDy6xSzLDwbrS0YN/y7qwGAYAeB7m/cXqndds38q/DrIUfyysDUJZWed3OO9H1lO4AQnB6Kd3mDIxta2N4sBXwuEJIzVTrMIEGj79Gt9lRhMQTXpzduA969OKLGBedKp+blweszkIAGm8VPmvPpiLhgN6siS9tMgX3SufVCnUqXXvRuwPyuKYgq9D8jsBJqpikJxXFB9qTXDLvislj4vTMbMuCxf75o+k4mDLDt6A5tKEo/fUTA7KwhlhvKH769qKKmcUpMX0JYhFlnS4PKZx5PKN9Ia09q5KgRmNfen4ELkwDBWBLpkADCLWRa8Bk2wKU1XFQPdqqC+BbLtcHNwiXY+4IXIonxmKX9hGuFcJ8/wxTRCAC6gkduHFYCBMBA63JfMOI1eSuRsBKd9dgosipmGq7ZJjpwUigDQBz5E2biYrVzMVkIk0B8Si/JPnuaT78t5Wzg/r3EBa+RN5vvYErJH/nd0eb50Jwe51hyk6lnrQx3DqLV/nJMN82cjvCTBivDO2YkcaMY8Gf9Gxm2b8XZk92jtt4Sdm9FkFCct42mI=
+  on:
+    tags: true
+    repo: HEPData/hepdata-converter-ws-client
+    branch: master
