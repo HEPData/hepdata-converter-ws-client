@@ -10,11 +10,14 @@ install:
 - sudo pip install --upgrade pip
 - sudo pip install coveralls
 - sudo pip install -r requirements.txt
+
 script:
 - export CURRENT_PATH=`pwd`
-- docker run -v $CURRENT_PATH:$CURRENT_PATH hepdata/hepdata-converter-ws /bin/bash -c "sudo pip install hepdata-converter-ws && cd  $CURRENT_PATH && coverage run -m unittest discover hepdata_converter_ws_client/testsuite 'test_*'"
+- docker run -v $CURRENT_PATH:$CURRENT_PATH hepdata/hepdata-converter-ws /bin/bash -c "cd $CURRENT_PATH && sudo pip install hepdata-converter-ws && coverage run -m unittest discover hepdata_converter_ws_client/testsuite 'test_*'"
 
 after_success:
+- ls -al
+- coverage --version
 - coveralls
 
 deploy:

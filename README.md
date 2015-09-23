@@ -1,3 +1,12 @@
+[![Build Status](https://travis-ci.org/HEPData/hepdata-converter-ws-client.svg?branch=master)](https://travis-ci.org/HEPData/hepdata-converter-ws-client)
+
+[![Coverage Status](https://coveralls.io/repos/HEPData/hepdata-converter-ws-client/badge.svg?branch=master&service=github)](https://coveralls.io/github/HEPData/hepdata-converter-ws-client?branch=master)
+
+[![PyPi](https://img.shields.io/pypi/dm/hepdata-converter-ws-client.svg)](https://pypi.python.org/pypi/hepdata-converter-ws-client/)
+
+[![PyPi](https://img.shields.io/github/license/hepdata/hepdata-converter-ws-client.svg)](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/LICENSE.txt)
+
+
 # hepdata-converter-ws-client
 
 Light client wrapper for interaction with hepdata-converter-ws (Web Services).
