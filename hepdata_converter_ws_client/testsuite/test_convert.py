@@ -146,3 +146,16 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
             tar.extractall(tmp_path)
         self.assertDirsEqual(os.path.join(tmp_path, ARCHIVE_NAME),
                              oldhepdata_yaml_path)
+
+    @insert_data_as_file('oldhepdata/sample.input')
+    @insert_path('oldhepdata/yaml')
+    def test_return_value(self, oldhepdata_file, oldhepdata_yaml_path):
+        # test fileobj
+        path = os.path.join(self.current_tmp, 'yaml')
+        r = hepdata_converter_ws_client.convert(self.get_server_url(), oldhepdata_file,
+                                                options={'input_format': 'oldhepdata'})
+
+        with tarfile.open(mode='r:gz', fileobj=StringIO.StringIO(r)) as tar:
+            tar.extractall(path)
+
+        self.assertDirsEqual(oldhepdata_yaml_path, os.path.join(path, ARCHIVE_NAME))

@@ -7,14 +7,65 @@ import tarfile
 import cStringIO
 import tempfile
 import shutil
+import StringIO
 
 __author__ = 'Michał Szostak'
 
 ARCHIVE_NAME = 'hepdata-converter-ws-data'
 
 
-def convert(url, input, output, options={}, id=None, extract=True):
+def convert(url, input, output=None, options={}, id=None, extract=True):
+    """Wrapper function around requests library providing easy way to interact
+    with hepdata-converter-ws (web services).
+
+    :param url: path to server hosting hepdata-converter-ws (web services) - url has to point to root server
+    (not ```/convert``` or any other specific route) just http(s)://address:port
+    :type url: str
+
+    :param input: Input, can be either path (str / unicode) to the file / directory that should be converted, or
+    fileobject containing data with the content of the file that should be converted
+
+    :type input: str / unicode / fileobject
+    :param output: Output, can be either path (str / unicode) to the file / directory to which output should be written
+    (in this case it will be automatically extracted, extract argument must be True), fileobject (in this case extract
+    flag must be False, the response tar.gz content will be written to output fileobject) or None (not specified).
+    If output is not specified extract flag is not taken into consideration and function returns content of the requested
+    tar.gz file.
+
+    :type output: str / unicode / fileobject
+
+    :param options: Options passed to the converter - the same as the ones accepted by hepdata_converter.convert
+    function (https://github.com/HEPData/hepdata-converter). Most basic key / values are:
+    'input_format': 'yaml'
+    'output_format': 'root'
+
+    if not output_format has been specified the default is YAML
+    if not input_format has been specified the default is YAML
+
+    :type options: dict
+
+    :param id: used for caching purposes (can be any object that can be turned into string) - if two convert calls
+    have the same ID and output types same output will be returned. Because of this if IDs are equal it implies input
+    files equality
+    :type id: str / int
+
+    :param extract: If set to True the requested tar.gz will be extracted to directory specified in output. If set to
+    False requested tar.gz file fill be written to output. If no output has been specified this attribute is not taken
+    into account.
+    IMPORTANT if output is a file object (not a path) extract must be set to False
+    :type extract: bool
+
+    :raise ValueError: if input vales are not sane ValueError is raised
+
+    :rtype : str Binary data
+    :return: Binary data containing tar.gz return type. value is returned from this function if and only if no output
+    has been specified
+    """
     input_stream = cStringIO.StringIO()
+    output_defined = output is not None
+    if not output_defined:
+        extract = False
+        output = StringIO.StringIO()
 
     # input is a path, treat is as such
     if isinstance(input, (str, unicode)):
@@ -60,3 +111,6 @@ def convert(url, input, output, options={}, id=None, extract=True):
             output.write(r.content)
         else:
             raise ValueError('output is not path or file object')
+
+    if not output_defined:
+        return output.getvalue()
