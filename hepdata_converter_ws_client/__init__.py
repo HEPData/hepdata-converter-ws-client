@@ -92,7 +92,13 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
     r = requests.get(url+'/convert', data=json.dumps(data),
                      headers={'Content-type': 'application/json', 'Accept': 'application/x-gzip'})
 
-    if extract:
+    error_occurred = False
+    try:
+        tarfile.open('r:gz', fileobj=cStringIO.StringIO(r.content))
+    except tarfile.ReadError:
+        error_occurred = True
+
+    if extract and not error_occurred:
         if not isinstance(output, (str, unicode)):
             raise ValueError('if extract=True then output must be path')
 
@@ -114,3 +120,7 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
 
     if not output_defined:
         return output.getvalue()
+    elif error_occurred:
+        return False
+    else:
+        return True
