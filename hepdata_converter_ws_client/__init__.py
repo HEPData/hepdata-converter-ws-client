@@ -11,8 +11,6 @@ import StringIO
 
 __author__ = 'Michał Szostak'
 
-ARCHIVE_NAME = 'hepdata-converter-ws-data'
-
 
 def convert(url, input, output=None, options={}, id=None, extract=True):
     """Wrapper function around requests library providing easy way to interact
@@ -67,15 +65,17 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
         extract = False
         output = StringIO.StringIO()
 
+    archive_name = options.get('filename', 'hepdata-converter-ws-data')
+
     # input is a path, treat is as such
     if isinstance(input, (str, unicode)):
         assert os.path.exists(input)
 
         with tarfile.open(mode='w:gz', fileobj=input_stream) as tar:
-            tar.add(input, arcname=ARCHIVE_NAME)
+            tar.add(input, arcname=archive_name)
     elif hasattr(input, 'read'):
         with tarfile.open(mode='w:gz', fileobj=input_stream) as tar:
-            info = tarfile.TarInfo(ARCHIVE_NAME)
+            info = tarfile.TarInfo(archive_name)
             input.seek(0, os.SEEK_END)
             info.size = input.tell()
             input.seek(0)
@@ -90,11 +90,12 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
         data['id'] = id
 
     r = requests.get(url+'/convert', data=json.dumps(data),
-                     headers={'Content-type': 'application/json', 'Accept': 'application/x-gzip'})
+                     headers={'Content-type': 'application/json',
+                              'Accept': 'application/x-gzip'})
 
     error_occurred = False
     try:
-        tarfile.open('r:gz', fileobj=cStringIO.StringIO(r.content))
+        tarfile.open('r:gz', fileobj=cStringIO.StringIO(r.content)).close()
     except tarfile.ReadError:
         error_occurred = True
 
@@ -106,7 +107,7 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
         try:
             with tarfile.open('r:gz', fileobj=cStringIO.StringIO(r.content)) as tar:
                 tar.extractall(tmp_dir)
-            shutil.move(os.path.join(tmp_dir, ARCHIVE_NAME), output)
+            shutil.move(os.path.join(tmp_dir, archive_name), output)
         finally:
             shutil.rmtree(tmp_dir, ignore_errors=True)
     else:
