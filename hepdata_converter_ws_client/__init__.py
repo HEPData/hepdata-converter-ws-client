@@ -89,7 +89,8 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
     if id:
         data['id'] = id
 
-    r = requests.get(url+'/convert', data=json.dumps(data),
+    r = requests.get(url + '/convert',
+                     data=json.dumps(data),
                      headers={'Content-type': 'application/json',
                               'Accept': 'application/x-gzip'})
 
@@ -107,7 +108,8 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
         try:
             with tarfile.open('r:gz', fileobj=cStringIO.StringIO(r.content)) as tar:
                 tar.extractall(tmp_dir)
-            shutil.move(os.path.join(tmp_dir, archive_name), output)
+            content = os.listdir(tmp_dir)[0]
+            shutil.move(os.path.join(tmp_dir, content), output)
         finally:
             shutil.rmtree(tmp_dir, ignore_errors=True)
     else:
