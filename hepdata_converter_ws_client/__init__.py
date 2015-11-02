@@ -11,6 +11,7 @@ import StringIO
 
 __author__ = 'Michał Szostak'
 
+ARCHIVE_NAME = 'hepdata-converter-ws-data'
 
 def convert(url, input, output=None, options={}, id=None, extract=True):
     """Wrapper function around requests library providing easy way to interact
@@ -65,7 +66,7 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
         extract = False
         output = StringIO.StringIO()
 
-    archive_name = options.get('filename', 'hepdata-converter-ws-data')
+    archive_name = options.get('filename', ARCHIVE_NAME)
 
     # input is a path, treat is as such
     if isinstance(input, (str, unicode)):
