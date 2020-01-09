@@ -4,10 +4,9 @@ import json
 import os
 import requests
 import tarfile
-import cStringIO
 import tempfile
 import shutil
-import StringIO
+from io import StringIO
 
 __author__ = 'Michał Szostak'
 
@@ -60,7 +59,7 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
     :return: Binary data containing tar.gz return type. value is returned from this function if and only if no output
     has been specified
     """
-    input_stream = cStringIO.StringIO()
+    input_stream = StringIO.StringIO()
     output_defined = output is not None
     if not output_defined:
         extract = False
@@ -97,7 +96,7 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
 
     error_occurred = False
     try:
-        tarfile.open('r:gz', fileobj=cStringIO.StringIO(r.content)).close()
+        tarfile.open('r:gz', fileobj=StringIO.StringIO(r.content)).close()
     except tarfile.ReadError:
         error_occurred = True
 
@@ -107,7 +106,7 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
 
         tmp_dir = tempfile.mkdtemp(suffix='hdc')
         try:
-            with tarfile.open('r:gz', fileobj=cStringIO.StringIO(r.content)) as tar:
+            with tarfile.open('r:gz', fileobj=StringIO.StringIO(r.content)) as tar:
                 tar.extractall(tmp_dir)
             content = os.listdir(tmp_dir)[0]
             shutil.move(os.path.join(tmp_dir, content), output)
