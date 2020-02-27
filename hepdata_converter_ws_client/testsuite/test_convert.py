@@ -3,9 +3,10 @@ import requests
 import tarfile
 from threading import Thread
 import time
-import StringIO
+from io import StringIO, BytesIO
 from flask.globals import request
-from hepdata_converter.testsuite import insert_path, TMPDirMixin, ExtendedTestCase, insert_data_as_file
+from hepdata_converter_ws_client.testsuite import insert_data_as_binary_file
+from hepdata_converter.testsuite import insert_path, TMPDirMixin, ExtendedTestCase
 from hepdata_converter_ws_client import ARCHIVE_NAME
 from hepdata_converter_ws import create_app
 import hepdata_converter_ws_client
@@ -24,7 +25,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
 
     def setUp(self):
         super(ConvertTestCase, self).setUp()
-        
+
         class ServerThread(Thread):
             def run(self):
                 app = create_app()
@@ -63,7 +64,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
 
         self.assertDirsEqual(oldhepdata_yaml_path, path)
 
-    @insert_data_as_file('oldhepdata/sample.input')
+    @insert_data_as_binary_file('oldhepdata/sample.input')
     @insert_path('oldhepdata/yaml')
     def test_convert_fileobj(self, oldhepdata_file, oldhepdata_yaml_path):
         # test fileobj
@@ -73,7 +74,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
 
         self.assertDirsEqual(oldhepdata_yaml_path, path)
 
-    @insert_data_as_file('oldhepdata/sample.input')
+    @insert_data_as_binary_file('oldhepdata/sample.input')
     def test_convert_wrong_args(self, oldhepdata_file):
         self.assertRaises(ValueError,
                           hepdata_converter_ws_client.convert,
@@ -107,13 +108,13 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
 
     @insert_path('oldhepdata/sample.input')
     def test_extract_error(self, oldhepdata_path):
-        output = StringIO.StringIO()
+        output = StringIO()
         self.assertRaises(ValueError,
                           hepdata_converter_ws_client.convert,
                           self.get_server_url(), oldhepdata_path, output,
                           options={'input_format': 'oldhepdata'})
 
-    @insert_data_as_file('oldhepdata/sample.input')
+    @insert_data_as_binary_file('oldhepdata/sample.input')
     @insert_path('oldhepdata/yaml')
     def test_convert_fileobj(self, oldhepdata_file, oldhepdata_yaml_path):
         # test fileobj
@@ -126,7 +127,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
     @insert_path('oldhepdata/sample.input')
     @insert_path('oldhepdata/yaml')
     def test_convert_no_extract(self, oldhepdata_path, oldhepdata_yaml_path):
-        output = StringIO.StringIO()
+        output = BytesIO()
         hepdata_converter_ws_client.convert(self.get_server_url(), oldhepdata_path, output,
                                             options={'input_format': 'oldhepdata'}, extract=False)
         output.seek(0)
@@ -147,7 +148,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
         self.assertDirsEqual(os.path.join(tmp_path, ARCHIVE_NAME),
                              oldhepdata_yaml_path)
 
-    @insert_data_as_file('oldhepdata/sample.input')
+    @insert_data_as_binary_file('oldhepdata/sample.input')
     @insert_path('oldhepdata/yaml')
     def test_return_value(self, oldhepdata_file, oldhepdata_yaml_path):
         # test fileobj
@@ -155,7 +156,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
         r = hepdata_converter_ws_client.convert(self.get_server_url(), oldhepdata_file,
                                                 options={'input_format': 'oldhepdata'})
 
-        with tarfile.open(mode='r:gz', fileobj=StringIO.StringIO(r)) as tar:
+        with tarfile.open(mode='r:gz', fileobj=BytesIO(r)) as tar:
             tar.extractall(path)
 
         self.assertDirsEqual(oldhepdata_yaml_path, os.path.join(path, ARCHIVE_NAME))

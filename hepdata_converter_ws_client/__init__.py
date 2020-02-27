@@ -1,12 +1,14 @@
 # -*- encoding: utf-8 -*-
 import base64
+import gzip
 import json
 import os
 import requests
 import tarfile
 import tempfile
 import shutil
-from io import StringIO
+from io import BytesIO, StringIO
+from builtins import str as text
 
 __author__ = 'Michał Szostak'
 
@@ -59,16 +61,16 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
     :return: Binary data containing tar.gz return type. value is returned from this function if and only if no output
     has been specified
     """
-    input_stream = StringIO.StringIO()
+    input_stream = BytesIO()
     output_defined = output is not None
     if not output_defined:
         extract = False
-        output = StringIO.StringIO()
+        output = BytesIO()
 
     archive_name = options.get('filename', ARCHIVE_NAME)
 
     # input is a path, treat is as such
-    if isinstance(input, (str, unicode)):
+    if isinstance(input, str):
         assert os.path.exists(input)
 
         with tarfile.open(mode='w:gz', fileobj=input_stream) as tar:
@@ -83,7 +85,9 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
     else:
         raise ValueError('input is not path or file object!')
 
-    data = {'input': base64.encodestring(input_stream.getvalue()),
+    inputdata = input_stream.getvalue()
+
+    data = {'input': base64.b64encode(inputdata).decode('utf-8'),
             'options': options}
 
     if id:
@@ -96,24 +100,24 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
 
     error_occurred = False
     try:
-        tarfile.open('r:gz', fileobj=StringIO.StringIO(r.content)).close()
+        tarfile.open('r:gz', fileobj=BytesIO(r.content)).close()
     except tarfile.ReadError:
         error_occurred = True
 
     if extract and not error_occurred:
-        if not isinstance(output, (str, unicode)):
+        if not isinstance(output, str):
             raise ValueError('if extract=True then output must be path')
 
         tmp_dir = tempfile.mkdtemp(suffix='hdc')
         try:
-            with tarfile.open('r:gz', fileobj=StringIO.StringIO(r.content)) as tar:
+            with tarfile.open('r:gz', fileobj=BytesIO(r.content)) as tar:
                 tar.extractall(tmp_dir)
             content = os.listdir(tmp_dir)[0]
             shutil.move(os.path.join(tmp_dir, content), output)
         finally:
             shutil.rmtree(tmp_dir, ignore_errors=True)
     else:
-        if isinstance(output, (str, unicode)):
+        if isinstance(output, str):
             with open(output, 'wb') as f:
                 f.write(r.content)
         elif hasattr(output, 'write'):
