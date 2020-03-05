@@ -1,13 +1,12 @@
 # -*- encoding: utf-8 -*-
 import base64
-import gzip
 import json
 import os
 import requests
 import tarfile
 import tempfile
 import shutil
-from io import BytesIO, StringIO
+from io import BytesIO
 from builtins import str as text
 
 __author__ = 'Michał Szostak'
@@ -70,7 +69,7 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
     archive_name = options.get('filename', ARCHIVE_NAME)
 
     # input is a path, treat is as such
-    if isinstance(input, str):
+    if isinstance(input, (str, text)):
         assert os.path.exists(input)
 
         with tarfile.open(mode='w:gz', fileobj=input_stream) as tar:
@@ -105,7 +104,7 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
         error_occurred = True
 
     if extract and not error_occurred:
-        if not isinstance(output, str):
+        if not isinstance(output, (str, text)):
             raise ValueError('if extract=True then output must be path')
 
         tmp_dir = tempfile.mkdtemp(suffix='hdc')
@@ -117,7 +116,7 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
         finally:
             shutil.rmtree(tmp_dir, ignore_errors=True)
     else:
-        if isinstance(output, str):
+        if isinstance(output, (str, text)):
             with open(output, 'wb') as f:
                 f.write(r.content)
         elif hasattr(output, 'write'):

@@ -16,6 +16,7 @@ setup(
     name='hepdata-converter-ws-client',
     version=get_version(),
     install_requires=[
+        'future',
         'requests',
     ],
     tests_require=['pyyaml'],
