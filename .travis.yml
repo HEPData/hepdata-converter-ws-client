@@ -25,6 +25,7 @@ after_success:
 
 after_failure:
 - docker logs --details hepdata-converter-ws-tests
+- docker ps
 
 deploy:
   provider: pypi
