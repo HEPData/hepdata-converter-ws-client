@@ -1,16 +1,11 @@
 # -*- encoding: utf-8 -*-
-import requests
 import tarfile
-from threading import Thread
-import time
 from io import StringIO, BytesIO
-from flask.globals import request
-from hepdata_converter_ws_client.testsuite import insert_data_as_binary_file
-from hepdata_converter.testsuite import insert_path, TMPDirMixin, ExtendedTestCase
-from hepdata_converter_ws_client import ARCHIVE_NAME
-from hepdata_converter_ws import create_app
-import hepdata_converter_ws_client
 import os
+
+from hepdata_converter_ws_client.testsuite import insert_path, insert_data_as_binary_file, TMPDirMixin, ExtendedTestCase
+from hepdata_converter_ws_client import ARCHIVE_NAME
+import hepdata_converter_ws_client
 
 __author__ = 'Michał Szostak'
 
@@ -18,41 +13,8 @@ __author__ = 'Michał Szostak'
 class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
     PORT = 8945
 
-    def tearDown(self):
-        super(ConvertTestCase, self).tearDown()
-        requests.post(self.get_server_url()+self.get_server_kill_route())
-        self.server.join()
-
-    def setUp(self):
-        super(ConvertTestCase, self).setUp()
-
-        class ServerThread(Thread):
-            def run(self):
-                app = create_app()
-                app.config['TESTING'] = True
-                app.config['LIVESERVER_PORT'] = ConvertTestCase.PORT
-
-                # this route has to be added in order to ensure server is killed on
-                # tearDown
-                @app.route(ConvertTestCase.get_server_kill_route(), methods=['POST'])
-                def shutdown():
-                    request.environ.get('werkzeug.server.shutdown')()
-                    return 'Server shutting down...'
-
-                # Debug must be set to false - otherwise flask will try to bind signal,
-                # which is not possible in the thread (not main process)
-                app.run(port=ConvertTestCase.PORT, debug=False)
-
-        self.server = ServerThread()
-        self.server.start()
-        time.sleep(1)
-
     def get_server_url(self):
         return 'http://localhost:%s' % self.PORT
-
-    @classmethod
-    def get_server_kill_route(cls):
-        return '/__kill__'
 
     @insert_path('oldhepdata/sample.input')
     @insert_path('oldhepdata/yaml')
