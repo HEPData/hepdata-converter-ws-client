@@ -24,11 +24,6 @@ after_success:
 - coverage --version
 - coveralls
 
-after_failure:
-- docker logs --details hepdata-converter-ws-tests
-- docker ps
-- wget http://localhost:8945 || echo "wget failed"
-
 deploy:
   provider: pypi
   user: hepdata
