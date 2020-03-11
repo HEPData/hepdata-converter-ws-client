@@ -1,6 +1,7 @@
 language: python
 python:
 - '2.7'
+- '3.7'
 sudo: required
 cache:
 - docker
@@ -9,11 +10,14 @@ services:
 install:
 - sudo pip install --upgrade pip
 - sudo pip install coveralls
-- sudo pip install -r requirements.txt
+- sudo pip install --ignore-installed -r requirements.txt
+
+before_script:
+- docker run -d -p 0.0.0.0:8945:5000 --name hepdata-converter-ws-tests hepdata/hepdata-converter-ws
+- sleep 1
 
 script:
-- export CURRENT_PATH=`pwd`
-- docker run -v $CURRENT_PATH:$CURRENT_PATH hepdata/hepdata-converter-ws /bin/bash -c "cd $CURRENT_PATH && sudo pip install hepdata-converter-ws && coverage run -m unittest discover hepdata_converter_ws_client/testsuite 'test_*'"
+- coverage run -m unittest discover hepdata_converter_ws_client/testsuite 'test_*'
 
 after_success:
 - ls -al

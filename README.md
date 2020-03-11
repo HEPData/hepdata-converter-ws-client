@@ -106,9 +106,10 @@ file object, it's then responsibility of the user to decompress it)
 
 ```
 import hepdata_converter_ws_client
+from io import BytesIO
 # using path to input file, writing to output stream
 input_path = '/path/to/input.txt'
-output = StringIO.StringIO()
+output = BytesIO()
 hepdata_converter_ws_client.convert('http://hepdata-converter-ws-addr:port', input_path, output,
                                     options={'input_format': 'oldhepdata'}, extract=False)
 

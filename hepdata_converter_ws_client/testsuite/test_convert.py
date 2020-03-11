@@ -1,15 +1,11 @@
 # -*- encoding: utf-8 -*-
-import requests
 import tarfile
-from threading import Thread
-import time
-import StringIO
-from flask.globals import request
-from hepdata_converter.testsuite import insert_path, TMPDirMixin, ExtendedTestCase, insert_data_as_file
-from hepdata_converter_ws_client import ARCHIVE_NAME
-from hepdata_converter_ws import create_app
-import hepdata_converter_ws_client
+from io import StringIO, BytesIO
 import os
+
+from hepdata_converter_ws_client.testsuite import insert_path, insert_data_as_binary_file, TMPDirMixin, ExtendedTestCase
+from hepdata_converter_ws_client import ARCHIVE_NAME
+import hepdata_converter_ws_client
 
 __author__ = 'Michał Szostak'
 
@@ -17,41 +13,8 @@ __author__ = 'Michał Szostak'
 class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
     PORT = 8945
 
-    def tearDown(self):
-        super(ConvertTestCase, self).tearDown()
-        requests.post(self.get_server_url()+self.get_server_kill_route())
-        self.server.join()
-
-    def setUp(self):
-        super(ConvertTestCase, self).setUp()
-        
-        class ServerThread(Thread):
-            def run(self):
-                app = create_app()
-                app.config['TESTING'] = True
-                app.config['LIVESERVER_PORT'] = ConvertTestCase.PORT
-
-                # this route has to be added in order to ensure server is killed on
-                # tearDown
-                @app.route(ConvertTestCase.get_server_kill_route(), methods=['POST'])
-                def shutdown():
-                    request.environ.get('werkzeug.server.shutdown')()
-                    return 'Server shutting down...'
-
-                # Debug must be set to false - otherwise flask will try to bind signal,
-                # which is not possible in the thread (not main process)
-                app.run(port=ConvertTestCase.PORT, debug=False)
-
-        self.server = ServerThread()
-        self.server.start()
-        time.sleep(1)
-
     def get_server_url(self):
         return 'http://localhost:%s' % self.PORT
-
-    @classmethod
-    def get_server_kill_route(cls):
-        return '/__kill__'
 
     @insert_path('oldhepdata/sample.input')
     @insert_path('oldhepdata/yaml')
@@ -63,7 +26,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
 
         self.assertDirsEqual(oldhepdata_yaml_path, path)
 
-    @insert_data_as_file('oldhepdata/sample.input')
+    @insert_data_as_binary_file('oldhepdata/sample.input')
     @insert_path('oldhepdata/yaml')
     def test_convert_fileobj(self, oldhepdata_file, oldhepdata_yaml_path):
         # test fileobj
@@ -73,7 +36,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
 
         self.assertDirsEqual(oldhepdata_yaml_path, path)
 
-    @insert_data_as_file('oldhepdata/sample.input')
+    @insert_data_as_binary_file('oldhepdata/sample.input')
     def test_convert_wrong_args(self, oldhepdata_file):
         self.assertRaises(ValueError,
                           hepdata_converter_ws_client.convert,
@@ -107,13 +70,13 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
 
     @insert_path('oldhepdata/sample.input')
     def test_extract_error(self, oldhepdata_path):
-        output = StringIO.StringIO()
+        output = StringIO()
         self.assertRaises(ValueError,
                           hepdata_converter_ws_client.convert,
                           self.get_server_url(), oldhepdata_path, output,
                           options={'input_format': 'oldhepdata'})
 
-    @insert_data_as_file('oldhepdata/sample.input')
+    @insert_data_as_binary_file('oldhepdata/sample.input')
     @insert_path('oldhepdata/yaml')
     def test_convert_fileobj(self, oldhepdata_file, oldhepdata_yaml_path):
         # test fileobj
@@ -126,7 +89,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
     @insert_path('oldhepdata/sample.input')
     @insert_path('oldhepdata/yaml')
     def test_convert_no_extract(self, oldhepdata_path, oldhepdata_yaml_path):
-        output = StringIO.StringIO()
+        output = BytesIO()
         hepdata_converter_ws_client.convert(self.get_server_url(), oldhepdata_path, output,
                                             options={'input_format': 'oldhepdata'}, extract=False)
         output.seek(0)
@@ -147,7 +110,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
         self.assertDirsEqual(os.path.join(tmp_path, ARCHIVE_NAME),
                              oldhepdata_yaml_path)
 
-    @insert_data_as_file('oldhepdata/sample.input')
+    @insert_data_as_binary_file('oldhepdata/sample.input')
     @insert_path('oldhepdata/yaml')
     def test_return_value(self, oldhepdata_file, oldhepdata_yaml_path):
         # test fileobj
@@ -155,7 +118,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
         r = hepdata_converter_ws_client.convert(self.get_server_url(), oldhepdata_file,
                                                 options={'input_format': 'oldhepdata'})
 
-        with tarfile.open(mode='r:gz', fileobj=StringIO.StringIO(r)) as tar:
+        with tarfile.open(mode='r:gz', fileobj=BytesIO(r)) as tar:
             tar.extractall(path)
 
         self.assertDirsEqual(oldhepdata_yaml_path, os.path.join(path, ARCHIVE_NAME))
