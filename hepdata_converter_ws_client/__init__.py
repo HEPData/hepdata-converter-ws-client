@@ -8,12 +8,19 @@ import tempfile
 import shutil
 from io import BytesIO
 from builtins import str as text
+from future.utils import raise_from
 
 __author__ = 'Michał Szostak'
 
 ARCHIVE_NAME = 'hepdata-converter-ws-data'
 
-def convert(url, input, output=None, options={}, id=None, extract=True):
+
+class Error(Exception):
+    """Generic exception for hepdata_converter_ws_client"""
+    pass
+
+
+def convert(url, input, output=None, options={}, id=None, extract=True, timeout=600):
     """Wrapper function around requests library providing easy way to interact
     with hepdata-converter-ws (web services).
 
@@ -54,7 +61,12 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
     IMPORTANT if output is a file object (not a path) extract must be set to False
     :type extract: bool
 
-    :raise ValueError: if input vales are not sane ValueError is raised
+    :param timeout: the time after which the request to the webservice will be cancelled. Defaults to 600s.
+    :type timeout: int
+
+    :raise ValueError: if input values are not sane ValueError is raised
+
+    :raise Error: if the request to the server fails or times out
 
     :rtype : str Binary data
     :return: Binary data containing tar.gz return type. value is returned from this function if and only if no output
@@ -92,10 +104,15 @@ def convert(url, input, output=None, options={}, id=None, extract=True):
     if id:
         data['id'] = id
 
-    r = requests.get(url + '/convert',
-                     data=json.dumps(data),
-                     headers={'Content-type': 'application/json',
-                              'Accept': 'application/x-gzip'})
+    try:
+        r = requests.get(url + '/convert',
+                         data=json.dumps(data),
+                         headers={'Content-type': 'application/json',
+                                  'Accept': 'application/x-gzip'},
+                         timeout=timeout)
+        r.raise_for_status()
+    except requests.RequestException as e:
+        raise_from(Error('Request to %s failed' % url), e)
 
     error_occurred = False
     try:

@@ -2,6 +2,7 @@
 import tarfile
 from io import StringIO, BytesIO
 import os
+import requests
 
 from hepdata_converter_ws_client.testsuite import insert_path, insert_data_as_binary_file, TMPDirMixin, ExtendedTestCase
 from hepdata_converter_ws_client import ARCHIVE_NAME
@@ -48,7 +49,44 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
                           self.get_server_url(), oldhepdata_file, object(),
                           options={'input_format': 'oldhepdata'}, extract=False)
 
+    @insert_data_as_binary_file('oldhepdata/sample.input')
+    def test_convert_timeout(self, oldhepdata_file):
+        broken_url = 'https://example.com:81'
 
+        with self.assertRaises(hepdata_converter_ws_client.Error) as cm:
+            hepdata_converter_ws_client.convert(
+                broken_url,
+                oldhepdata_file,
+                self.current_tmp,
+                options={'input_format': 'oldhepdata'},
+                timeout=5
+            )
+
+        self.assertEqual('Request to %s failed' % broken_url,
+                         str(cm.exception))
+        self.assertTrue(isinstance(cm.exception.__cause__, requests.exceptions.ConnectTimeout))
+        self.assertTrue(str(cm.exception.__cause__).startswith(
+            "HTTPSConnectionPool(host='example.com', port=81): Max retries exceeded with url"
+        ))
+
+    @insert_data_as_binary_file('oldhepdata/sample.input')
+    def test_convert_404(self, oldhepdata_file):
+        broken_url = self.get_server_url() + '/notavalidurl'
+
+        with self.assertRaises(hepdata_converter_ws_client.Error) as cm:
+            hepdata_converter_ws_client.convert(
+                          broken_url,
+                          oldhepdata_file,
+                          self.current_tmp,
+                          options={'input_format': 'oldhepdata'},
+                          timeout=5)
+
+        self.assertEqual('Request to %s failed' % broken_url,
+                         str(cm.exception))
+        self.assertTrue(isinstance(cm.exception.__cause__, requests.exceptions.HTTPError))
+        self.assertTrue(str(cm.exception.__cause__).startswith(
+            "404 Client Error: NOT FOUND for url: %s" % broken_url
+        ))
 
     @insert_path('oldhepdata/sample.input')
     @insert_path('oldhepdata/yaml')
