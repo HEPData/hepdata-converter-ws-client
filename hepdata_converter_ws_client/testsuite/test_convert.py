@@ -64,7 +64,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
 
         self.assertEqual('Request to %s failed' % broken_url,
                          str(cm.exception))
-        self.assertTrue(isinstance(cm.exception.__cause__, requests.exceptions.ConnectTimeout))
+        self.assertTrue(isinstance(cm.exception.__cause__, (requests.exceptions.ConnectTimeout, requests.exceptions.ConnectionError)))
         self.assertTrue(str(cm.exception.__cause__).startswith(
             "HTTPSConnectionPool(host='example.com', port=81): Max retries exceeded with url"
         ))

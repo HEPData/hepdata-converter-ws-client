@@ -1,16 +1,21 @@
 language: python
+
 python:
 - '2.7'
 - '3.7'
+
 sudo: required
+
 cache:
 - docker
+
 services:
 - docker
+
 install:
-- sudo pip install --upgrade pip
+- sudo pip install --upgrade pip setuptools
 - sudo pip install coveralls
-- sudo pip install --ignore-installed -r requirements.txt
+- sudo pip install -I -e .[tests]
 
 before_script:
 - docker run -d -p 0.0.0.0:8945:5000 --name hepdata-converter-ws-tests hepdata/hepdata-converter-ws
@@ -25,11 +30,12 @@ after_success:
 - coveralls
 
 deploy:
+  skip_existing: true
   provider: pypi
-  user: hepdata
+  user: "__token__"
   password:
-    secure: gByrsSpqtgUKru839J10RUsZCuTw/RwsHHQVRhG5OxdGwS6s/s9zYxKOJJjA1YpiswDNOXVPC4I1pmty971g1kDDIJcV814PTsHUBhf7tDWx6ZJ2mjCoXl7zdPDH4sDxDy6xSzLDwbrS0YN/y7qwGAYAeB7m/cXqndds38q/DrIUfyysDUJZWed3OO9H1lO4AQnB6Kd3mDIxta2N4sBXwuEJIzVTrMIEGj79Gt9lRhMQTXpzduA969OKLGBedKp+blweszkIAGm8VPmvPpiLhgN6siS9tMgX3SufVCnUqXXvRuwPyuKYgq9D8jsBJqpikJxXFB9qTXDLvislj4vTMbMuCxf75o+k4mDLDt6A5tKEo/fUTA7KwhlhvKH769qKKmcUpMX0JYhFlnS4PKZx5PKN9Ia09q5KgRmNfen4ELkwDBWBLpkADCLWRa8Bk2wKU1XFQPdqqC+BbLtcHNwiXY+4IXIonxmKX9hGuFcJ8/wxTRCAC6gkduHFYCBMBA63JfMOI1eSuRsBKd9dgosipmGq7ZJjpwUigDQBz5E2biYrVzMVkIk0B8Si/JPnuaT78t5Wzg/r3EBa+RN5vvYErJH/nd0eb50Jwe51hyk6lnrQx3DqLV/nJMN82cjvCTBivDO2YkcaMY8Gf9Gxm2b8XZk92jtt4Sdm9FkFCct42mI=
+    secure: "MTlWFxc1U5Y9r6QqXyDge4nui3XyagSyf9POYSHaWFFkzNKGnqwtGNgOZbz6zXGDNgYUo87ZhZ70v8COeKNMJLlQFCNilxfs+gOM8w/eNg2mlaEV8HCep6aFnqnZPJRt8Q6CIi4tsnJeIEvddC0TouNBD5BHGbkbQbz49bZeA7DoVTTxppWCaegRCO7jQhdkxeyDXhG33wm4rcMS7/njhD+6dVAyMCt3cGdc0ZvdokeGteQh9QgbZP19L1RFoY1YdsO3bMIQKNiEtDzP4irYB9oYodYrhqSahcgOV57yfDPVebnpFOwuqZTvIPsyPeUFjo0iOTsy8Z3dqX+lnB0X7Z+wgNyDH2+BC6dJqcw8iHbOb54cFudGfUS5oc/kv3pP9StWwlEh+taqW9ElcmLAgvC+8x1na+o8A1jyozMpHmZqA4RgY+xS6kuUESVxRftQJ9xPAj0+Cu5ponRFHWFVPZjbLDOm6O1tUIgwpNcxl+wmiLDaTcerzXZvm3+LaK2WTkH1rrkVCPfQMQ234inGcQxwNVYaUiGCw5rRBrtOf+D+TgXORxS94AW8q2PdmEqGVK4b+mRnVqiL9kgQbJ5VavAe2+R6z7w9QHYNemCeMr/ovPpIJNYZF2eLFhr2UEuEMt5+8s1evTuG+eK8WmjUGJxql3Ms5fAhfmkfoSDt3qo="
+  distributions: "sdist bdist_wheel"
   on:
     tags: true
     repo: HEPData/hepdata-converter-ws-client
-    branch: master

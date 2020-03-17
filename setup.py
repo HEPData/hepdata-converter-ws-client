@@ -3,6 +3,11 @@ from setuptools import setup
 import re
 
 
+test_requirements = ['pyyaml>=5.3']
+
+extras_require = {'tests': test_requirements}
+
+
 def get_version():
     with open('hepdata_converter_ws_client/version.py', 'r') as version_f:
         content = version_f.read()
@@ -12,20 +17,28 @@ def get_version():
         return '0.0.0'
     return r.group('version')
 
+
+# Get the long description from the README file
+with open('README.md', 'rt') as fp:
+    long_description = fp.read()
+
+
 setup(
     name='hepdata-converter-ws-client',
     version=get_version(),
     install_requires=[
-        'future',
-        'requests',
+        'future>=0.18.2',
+        'requests>=2.23.0',
     ],
-    tests_require=['pyyaml'],
-
+    tests_require=test_requirements,
+    extras_require=extras_require,
     packages=['hepdata_converter_ws_client'],
-    url='https://github.com/HEPData/hepdata-converter-ws-client/',
+    url='https://github.com/HEPData/hepdata-converter-ws-client',
     license='GPL',
-    author='Michał Szostak',
-    author_email='michal.florian.szostak@cern.ch',
+    author='HEPData Team',
+    author_email='info@hepdata.net',
     description='Simple wrapper for requests, to ease use of HEPData Converter WebServices API',
     download_url='https://github.com/HEPData/hepdata-converter-ws-client/tarball/%s' % get_version(),
+    long_description=long_description,
+    long_description_content_type='text/markdown',
 )
