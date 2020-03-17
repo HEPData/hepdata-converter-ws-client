@@ -15,7 +15,6 @@ services:
 install:
 - sudo pip install --upgrade pip setuptools
 - sudo pip install coveralls
-- sudo pip install -I -e .[tests]
 
 before_script:
 - docker run -d -p 0.0.0.0:8945:5000 --name hepdata-converter-ws-tests hepdata/hepdata-converter-ws
