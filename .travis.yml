@@ -15,13 +15,14 @@ services:
 install:
 - sudo pip install --upgrade pip setuptools
 - sudo pip install coveralls
+- sudo pip install -I -e .[tests]
+- sudo rm -rf build hepdata_converter_ws_client.egg-info
 
 before_script:
 - docker run -d -p 0.0.0.0:8945:5000 --name hepdata-converter-ws-tests hepdata/hepdata-converter-ws
 - sleep 1
 
 script:
-- pip install -I -e .[tests]
 - coverage run -m unittest discover hepdata_converter_ws_client/testsuite 'test_*'
 
 after_success:
