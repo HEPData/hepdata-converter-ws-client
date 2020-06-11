@@ -37,6 +37,21 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
 
         self.assertDirsEqual(oldhepdata_yaml_path, path)
 
+    @insert_path('oldhepdata/invalidsample.oldhepdata')
+    def test_convert_invalid(self, oldhepdata_path):
+        # test paths
+        path = os.path.join(self.current_tmp, 'yaml')
+        ret = hepdata_converter_ws_client.convert(self.get_server_url(),
+                                                  oldhepdata_path, path,
+                                                  options={'input_format': 'oldhepdata'})
+
+        assert(ret is False)
+        with open(path, 'r') as f:
+            data = f.read()
+            assert('<title>BadFormat: line can not be parsed: doi: 10.1007/JHEP03(2013)128 // Werkzeug Debugger</title>'
+                   in data)
+            f.close()
+
     @insert_data_as_binary_file('oldhepdata/sample.input')
     def test_convert_wrong_args(self, oldhepdata_file):
         self.assertRaises(ValueError,
