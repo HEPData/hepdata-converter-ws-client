@@ -104,8 +104,13 @@ def convert(url, input, output=None, options={}, id=None, extract=True, timeout=
                          headers={'Content-type': 'application/json',
                                   'Accept': 'application/x-gzip'},
                          timeout=timeout)
-        r.raise_for_status()
+
+        # Raise errors, with exception of 500 errors. We ignore 500 status
+        # codes and continue, to return the full error details
+        if r.status_code < 500:
+            r.raise_for_status()
     except requests.RequestException as e:
+        # We get here from a timeout as well as a non-500 error code
         raise_from(Error('Request to %s failed' % url), e)
 
     error_occurred = False
