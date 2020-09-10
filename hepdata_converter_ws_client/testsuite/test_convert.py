@@ -48,7 +48,7 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
         assert(ret is False)
         with open(path, 'r') as f:
             data = f.read()
-            assert('<title>BadFormat: line can not be parsed: doi: 10.1007/JHEP03(2013)128 // Werkzeug Debugger</title>'
+            assert('BadFormat: line can not be parsed: doi: 10.1007/JHEP03(2013)128'
                    in data)
             f.close()
 
