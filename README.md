@@ -1,4 +1,4 @@
-[![Travis Status](https://www.travis-ci.org/HEPData/hepdata-converter-ws-client.svg?branch=master)](https://www.travis-ci.org/HEPData/hepdata-converter-ws-client)
+[![GitHub Actions Status](https://github.com/HEPData/hepdata-converter-ws-client/workflows/Continuous%20Integration/badge.svg?branch=master)](https://github.com/HEPData/hepdata-converter-ws-client/actions?query=branch%3Amaster)
 [![Coveralls Status](https://coveralls.io/repos/github/HEPData/hepdata-converter-ws-client/badge.svg?branch=master)](https://coveralls.io/github/HEPData/hepdata-converter-ws-client?branch=master)
 [![License](https://img.shields.io/github/license/HEPData/hepdata-converter-ws-client.svg)](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/LICENSE.txt)
 [![GitHub Releases](https://img.shields.io/github/release/hepdata/hepdata-converter-ws-client.svg?maxAge=2592000)](https://github.com/HEPData/hepdata-converter-ws-client/releases)
