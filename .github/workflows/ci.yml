@@ -33,6 +33,7 @@ jobs:
       run: |
         coverage run -m unittest discover hepdata_converter_ws_client/testsuite 'test_*'
     - name: Run coveralls
+      if: ${{ startsWith('3', matrix.python-version) }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
