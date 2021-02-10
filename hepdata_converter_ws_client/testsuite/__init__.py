@@ -56,6 +56,24 @@ class insert_data_as_binary_file(object):
         return _inner
 
 
+class insert_data_as_extracted_dir(object):
+    def __init__(self, *sample_file_name):
+        self.sample_file_name = _parse_path_arguments(sample_file_name)
+        self.temp_path = tempfile.gettempdir()
+
+    def __call__(self, function):
+        def _inner(*args, **kwargs):
+            args = list(args)
+            with tempfile.TemporaryDirectory() as temp_dir:
+                shutil.unpack_archive(construct_testdata_path(self.sample_file_name), temp_dir)
+                # Assume zips consist of a single directory
+                unpacked_dir = os.path.join(temp_dir, os.listdir(temp_dir)[0])
+                args.append(unpacked_dir)
+                function(*args, **kwargs)
+
+        return _inner
+
+
 class insert_path(object):
     def __init__(self, *sample_file_name):
         self.sample_file_name = _parse_path_arguments(sample_file_name)

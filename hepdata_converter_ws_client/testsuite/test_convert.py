@@ -4,7 +4,7 @@ from io import StringIO, BytesIO
 import os
 import requests
 
-from hepdata_converter_ws_client.testsuite import insert_path, insert_data_as_binary_file, TMPDirMixin, ExtendedTestCase
+from hepdata_converter_ws_client.testsuite import insert_path, insert_data_as_binary_file, insert_data_as_extracted_dir, TMPDirMixin, ExtendedTestCase
 from hepdata_converter_ws_client import ARCHIVE_NAME
 import hepdata_converter_ws_client
 
@@ -36,6 +36,15 @@ class ConvertTestCase(TMPDirMixin, ExtendedTestCase):
                                             options={'input_format': 'oldhepdata'})
 
         self.assertDirsEqual(oldhepdata_yaml_path, path)
+
+    @insert_data_as_extracted_dir('testsubmission/TestHEPSubmission.zip')
+    @insert_path('testsubmission/yaml')
+    def test_convert_zip_with_resources(self, testsubmission_file, testsubmission_yaml_path):
+        # test zip
+        path = os.path.join(self.current_tmp, 'yaml')
+        hepdata_converter_ws_client.convert(self.get_server_url(), testsubmission_file, path,
+                                            options={'input_format': 'yaml'})
+        self.assertDirsEqual(testsubmission_yaml_path, path)
 
     @insert_path('oldhepdata/invalidsample.oldhepdata')
     def test_convert_invalid(self, oldhepdata_path):
