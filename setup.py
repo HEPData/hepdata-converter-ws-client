@@ -26,6 +26,7 @@ with open('README.md', 'rt') as fp:
 setup(
     name='hepdata-converter-ws-client',
     version=get_version(),
+    python_requires = '~=3.6',
     install_requires=[
         'future>=0.18.2',
         'requests>=2.23.0',
