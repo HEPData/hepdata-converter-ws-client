@@ -79,7 +79,15 @@ def convert(url, input, output=None, options={}, id=None, extract=True, timeout=
         assert os.path.exists(input)
 
         with tarfile.open(mode='w:gz', fileobj=input_stream) as tar:
-            tar.add(input, arcname=archive_name)
+            if os.path.isdir(input):
+                with os.scandir(input) as it:
+                    for entry in it:
+                        if entry.is_file():
+                            if os.path.splitext(entry.name)[1] in ['.yaml', '.json']:
+                                tar.add(entry.path, arcname=os.path.join(archive_name, entry.name))
+            else:
+                tar.add(input, arcname=archive_name)
+
     elif hasattr(input, 'read'):
         with tarfile.open(mode='w:gz', fileobj=input_stream) as tar:
             info = tarfile.TarInfo(archive_name)

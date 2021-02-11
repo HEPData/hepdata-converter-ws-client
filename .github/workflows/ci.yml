@@ -10,16 +10,13 @@ jobs:
   test:
 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [ '2.7', '3.7' ]
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.6
       uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.6
     - name: Install pip dependencies
       run: |
         pip install --upgrade pip setuptools
@@ -33,9 +30,9 @@ jobs:
       run: |
         coverage run -m unittest discover hepdata_converter_ws_client/testsuite 'test_*'
     - name: Run coveralls
-      if: startsWith(matrix.python-version, '3')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERALLS_SERVICE_NAME: github
       run: |
         coveralls
 
