@@ -66,42 +66,12 @@ def convert(url, input, output=None, options={}, id=None, extract=True, timeout=
     :return: Binary data containing tar.gz return type. value is returned from this function if and only if no output
     has been specified
     """
-    input_stream = BytesIO()
     output_defined = output is not None
     if not output_defined:
         extract = False
         output = BytesIO()
 
-    archive_name = options.get('filename', ARCHIVE_NAME)
-
-    # input is a path, treat is as such
-    if isinstance(input, (str, text)):
-        assert os.path.exists(input)
-
-        with tarfile.open(mode='w:gz', fileobj=input_stream) as tar:
-            if os.path.isdir(input):
-                with os.scandir(input) as it:
-                    for entry in it:
-                        if entry.is_file():
-                            if os.path.splitext(entry.name)[1] in ['.yaml', '.json']:
-                                tar.add(entry.path, arcname=os.path.join(archive_name, entry.name))
-            else:
-                tar.add(input, arcname=archive_name)
-
-    elif hasattr(input, 'read'):
-        with tarfile.open(mode='w:gz', fileobj=input_stream) as tar:
-            info = tarfile.TarInfo(archive_name)
-            input.seek(0, os.SEEK_END)
-            info.size = input.tell()
-            input.seek(0)
-            tar.addfile(info, fileobj=input)
-    else:
-        raise ValueError('input is not path or file object!')
-
-    inputdata = input_stream.getvalue()
-
-    data = {'input': base64.b64encode(inputdata).decode('utf-8'),
-            'options': options}
+    data = _create_data(input, options)
 
     if id:
         data['id'] = id
@@ -154,3 +124,60 @@ def convert(url, input, output=None, options={}, id=None, extract=True, timeout=
         return False
     else:
         return True
+
+
+def get_data_size(input, options={}):
+    """Gets the size in bytes of the json data that would be sent to the converter.
+
+    :param input: Input, can be either path (str / unicode) to the file / directory that should be converted, or
+    a file object containing data with the content of the file that should be converted
+    :type input: str / unicode / file object
+
+    :param options: Options passed to the converter - the same as the ones accepted by the hepdata_converter.convert
+    function (https://github.com/HEPData/hepdata-converter). Most basic keys / values are:
+    'input_format': 'yaml' (if input_format has not been specified the default is YAML)
+    'output_format': 'root' (if output_format has not been specified the default is YAML)
+    :type options: dict
+
+    :return: Size in bytes of the json data
+    :rtype: int
+    """
+    data = _create_data(input, options)
+    return len(json.dumps(data).encode('utf-8'))
+
+
+def _create_data(input, options):
+    input_stream = BytesIO()
+
+    archive_name = options.get('filename', ARCHIVE_NAME)
+
+    # input is a path, treat is as such
+    if isinstance(input, (str, text)):
+        assert os.path.exists(input)
+
+        with tarfile.open(mode='w:gz', fileobj=input_stream) as tar:
+            if os.path.isdir(input):
+                with os.scandir(input) as it:
+                    for entry in it:
+                        if entry.is_file():
+                            if os.path.splitext(entry.name)[1] in ['.yaml', '.json']:
+                                tar.add(entry.path, arcname=os.path.join(archive_name, entry.name))
+            else:
+                tar.add(input, arcname=archive_name)
+
+    elif hasattr(input, 'read'):
+        with tarfile.open(mode='w:gz', fileobj=input_stream) as tar:
+            info = tarfile.TarInfo(archive_name)
+            input.seek(0, os.SEEK_END)
+            info.size = input.tell()
+            input.seek(0)
+            tar.addfile(info, fileobj=input)
+    else:
+        raise ValueError('input is not path or file object!')
+
+    inputdata = input_stream.getvalue()
+
+    return {
+        'input': base64.b64encode(inputdata).decode('utf-8'),
+        'options': options
+    }
