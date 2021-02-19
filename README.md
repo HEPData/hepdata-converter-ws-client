@@ -46,9 +46,15 @@ The library defines the exception `hepdata_converter_ws_client.Error`
 which will be thrown on timeouts or other errors connecting to the
 server.
 
+A function `hepdata_converter_ws_client.get_data_size` gets the size
+in bytes of the JSON data that would be sent to the converter.  This
+could be useful in checking that a maximum payload size imposed by a
+web server is not exceeded.
+
 ### Function description
 
 [`hepdata_converter_ws_client.convert`](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/hepdata_converter_ws_client/__init__.py#L23) function has proper [docstring](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/hepdata_converter_ws_client/__init__.py#L24-L68) describing its arguments and return values.
+Similarly for [`hepdata_converter_ws_client.get_data_size`](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/hepdata_converter_ws_client/__init__.py#L129) with corresponding [docstring](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/hepdata_converter_ws_client/__init__.py#L130-L144).
 
 ### Convert using file paths
 
