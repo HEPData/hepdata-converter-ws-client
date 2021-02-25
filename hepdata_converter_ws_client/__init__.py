@@ -93,7 +93,7 @@ def convert(url, input, output=None, options={}, id=None, extract=True, timeout=
 
     error_occurred = False
     try:
-        tarfile.open('r:gz', fileobj=BytesIO(r.content)).close()
+        tarfile.open(mode='r:gz', fileobj=BytesIO(r.content)).close()
     except tarfile.ReadError:
         error_occurred = True
 
@@ -103,7 +103,7 @@ def convert(url, input, output=None, options={}, id=None, extract=True, timeout=
 
         tmp_dir = tempfile.mkdtemp(suffix='hdc')
         try:
-            with tarfile.open('r:gz', fileobj=BytesIO(r.content)) as tar:
+            with tarfile.open(mode='r:gz', fileobj=BytesIO(r.content)) as tar:
                 tar.extractall(tmp_dir)
             content = os.listdir(tmp_dir)[0]
             shutil.move(os.path.join(tmp_dir, content), output)
