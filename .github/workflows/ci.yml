@@ -3,7 +3,7 @@ name: Continuous Integration
 on:
   push:
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
   release:
     types: [published]
 
@@ -14,16 +14,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.6
-      uses: actions/setup-python@v2
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.6
+        python-version: '3.9'
     - name: Install pip dependencies
       run: |
         pip install --upgrade pip setuptools
-        pip install --ignore-installed coveralls
-        pip install -I -e .[tests]
+        pip install coveralls
+        pip install -e '.[tests]'
     - name: Start docker container
       run: |
         docker run -d -p 0.0.0.0:8945:5000 --name hepdata-converter-ws-tests hepdata/hepdata-converter-ws
@@ -42,18 +42,20 @@ jobs:
     needs: test
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/hepdata-converter-ws-client
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.6
-      uses: actions/setup-python@v2
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.6'
+        python-version: '3.9'
     - name: Build PyPI package
       run: |
         pip install wheel
         python setup.py sdist bdist_wheel
     - name: Publish distribution to PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_PASSWORD }}
+      uses: pypa/gh-action-pypi-publish@release/v1

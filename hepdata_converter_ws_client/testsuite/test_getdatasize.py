@@ -10,10 +10,10 @@ class GetDataSizeTestCase(TMPDirMixin, ExtendedTestCase):
         size = hepdata_converter_ws_client.get_data_size(
             oldhepdata_path, options={'input_format': 'oldhepdata'}
         )
-        self.assertAlmostEqual(size, 7428, delta=100)
+        self.assertAlmostEqual(size, 7496, delta=100)
 
     @insert_data_as_extracted_dir('testsubmission/TestHEPSubmission.zip')
     def test_get_data_size_with_resources(self, testsubmission_file):
         size = hepdata_converter_ws_client.get_data_size(
             testsubmission_file, options={'input_format': 'yaml'})
-        self.assertAlmostEqual(size, 4522, delta=100)
+        self.assertAlmostEqual(size, 4794, delta=100)

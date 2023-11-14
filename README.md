@@ -1,6 +1,6 @@
-[![GitHub Actions Status](https://github.com/HEPData/hepdata-converter-ws-client/workflows/Continuous%20Integration/badge.svg?branch=master)](https://github.com/HEPData/hepdata-converter-ws-client/actions?query=branch%3Amaster)
-[![Coveralls Status](https://coveralls.io/repos/github/HEPData/hepdata-converter-ws-client/badge.svg?branch=master)](https://coveralls.io/github/HEPData/hepdata-converter-ws-client?branch=master)
-[![License](https://img.shields.io/github/license/HEPData/hepdata-converter-ws-client.svg)](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/LICENSE.txt)
+[![GitHub Actions Status](https://github.com/HEPData/hepdata-converter-ws-client/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/HEPData/hepdata-converter-ws-client/actions?query=branch%3Amain)
+[![Coveralls Status](https://coveralls.io/repos/github/HEPData/hepdata-converter-ws-client/badge.svg?branch=main)](https://coveralls.io/github/HEPData/hepdata-converter-ws-client?branch=main)
+[![License](https://img.shields.io/github/license/HEPData/hepdata-converter-ws-client.svg)](https://github.com/HEPData/hepdata-converter-ws-client/blob/main/LICENSE.txt)
 [![GitHub Releases](https://img.shields.io/github/release/hepdata/hepdata-converter-ws-client.svg?maxAge=2592000)](https://github.com/HEPData/hepdata-converter-ws-client/releases)
 [![PyPI Version](https://img.shields.io/pypi/v/hepdata-converter-ws-client)](https://pypi.org/project/hepdata-converter-ws-client/)
 [![GitHub Issues](https://img.shields.io/github/issues/hepdata/hepdata-converter-ws-client.svg?maxAge=2592000)](https://github.com/HEPData/hepdata-converter-ws-client/issues)
@@ -53,8 +53,8 @@ web server is not exceeded.
 
 ### Function description
 
-[`hepdata_converter_ws_client.convert`](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/hepdata_converter_ws_client/__init__.py#L23) function has proper [docstring](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/hepdata_converter_ws_client/__init__.py#L24-L68) describing its arguments and return values.
-Similarly for [`hepdata_converter_ws_client.get_data_size`](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/hepdata_converter_ws_client/__init__.py#L129) with corresponding [docstring](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/hepdata_converter_ws_client/__init__.py#L130-L144).
+[`hepdata_converter_ws_client.convert`](https://github.com/HEPData/hepdata-converter-ws-client/blob/main/hepdata_converter_ws_client/__init__.py#L23) function has proper [docstring](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/hepdata_converter_ws_client/__init__.py#L24-L68) describing its arguments and return values.
+Similarly for [`hepdata_converter_ws_client.get_data_size`](https://github.com/HEPData/hepdata-converter-ws-client/blob/main/hepdata_converter_ws_client/__init__.py#L129) with corresponding [docstring](https://github.com/HEPData/hepdata-converter-ws-client/blob/master/hepdata_converter_ws_client/__init__.py#L130-L144).
 
 ### Convert using file paths
 
