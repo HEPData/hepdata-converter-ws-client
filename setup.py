@@ -26,12 +26,10 @@ with open('README.md', 'rt') as fp:
 setup(
     name='hepdata-converter-ws-client',
     version=get_version(),
-    python_requires = '~=3.6',
+    python_requires = '>=3.6',
     install_requires=[
-        'future>=0.18.2',
         'requests>=2.23.0',
     ],
-    tests_require=test_requirements,
     extras_require=extras_require,
     packages=['hepdata_converter_ws_client'],
     url='https://github.com/HEPData/hepdata-converter-ws-client',

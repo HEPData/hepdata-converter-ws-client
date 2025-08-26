@@ -8,7 +8,6 @@ import tempfile
 import shutil
 from io import BytesIO
 from builtins import str as text
-from future.utils import raise_from
 
 __author__ = 'Michał Szostak'
 
@@ -89,7 +88,7 @@ def convert(url, input, output=None, options={}, id=None, extract=True, timeout=
             r.raise_for_status()
     except requests.RequestException as e:
         # We get here from a timeout as well as a non-500 error code
-        raise_from(Error('Request to %s failed' % url), e)
+        raise Error('Request to %s failed' % url) from e
 
     error_occurred = False
     try:
